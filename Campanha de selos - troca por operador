@@ -1,0 +1,62 @@
+select a.nroempresa as Loja, 
+       a.nrocheckout as PDV,  
+       b.nronotafiscal Num_NFCe,
+       to_char(d.dtamovimento, 'dd/mm/yyyy') as DATA, 
+       d.seqturno as Turno, 
+       e.nome as Nome_Operador, 
+       sum(a.quantidade) as QTD_Cartelas,
+       substr(f.desccompleta,-8) as QTD_Selos,
+       a.vlrtotal as Valor_Troca_UN,
+       a.seqproduto, 
+       f.desccompleta as Produto_Resgate, 
+       sum(a.quantidade * a.vlrtotal) as Valor_Troca_TOTAL,
+        CASE 
+        WHEN b.status = 'C' THEN 'CUPOM_CANCELADO'
+        WHEN b.status = 'V' AND A.STATUS = 'C' THEN 'ITEM_CANCELADO'
+        ELSE 'VALIDO'
+    END AS STATUS
+from monitorpdv.tb_doctoitem a inner join monitorpdv.tb_doctocupom b
+  on a.nroempresa = b.nroempresa
+  and a.nrocheckout = b.nrocheckout
+  and a.seqdocto = b.seqdocto
+left join monitorpdv.tb_doctopessoa c
+      on a.seqdocto = c.seqdocto
+      and a.nroempresa = c.nroempresa
+      and a.nrocheckout = c.nrocheckout
+inner join monitorpdv.tb_docto d
+      on a.nroempresa = d.nroempresa
+      and a.nrocheckout = d.nrocheckout
+      and a.seqdocto = d.seqdocto
+inner join monitorpdv.tb_usuario e
+      on d.sequsuario = e.sequsuario
+inner join monitorpdv.tb_produto f
+      on a.seqproduto = f.seqproduto
+where trunc(a.dtahoremissao) between :DT1 and :DT2
+      and a.nroempresa = :vnc5NroEmpresa
+      and a.seqproduto in (
+      '276525',
+      '276529',
+      '276532',
+      '276533',
+      '276536',
+      '276537',
+      '276538',
+      '276539',
+      '276540',
+      '276541',
+      '276543',
+      '276544')
+      group by a.nroempresa, 
+      a.nrocheckout,
+      b.nronotafiscal, 
+      d.dtamovimento, 
+      d.seqturno, 
+      d.sequsuario, 
+      e.nome, 
+      a.seqproduto, 
+      f.desccompleta, 
+      a.quantidade, 
+      a.vlrtotal, 
+      b.status,
+      a.status
+order by d.dtamovimento,a.nrocheckout,d.seqturno,b.nronotafiscal;
