@@ -1,0 +1,15 @@
+select a.nroempresa as Empresa,
+       a.nrocheckout as PDV,
+       a.nroformapagto as FormaPagto,
+       to_char(a.dtahorlancto, 'dd/mm/yyyy hh24:MI:ss') as Dta_lancamento,
+       d.nronotafiscal,
+       a.vlrlancto as Valor,
+       b.cnpjcpf,
+       c.nomerazao
+        from consinco.mfl_financeiro a left join monitorpdv.tb_doctopessoa b on a.nroempresa = b.nroempresa and a.nrocheckout = b.nrocheckout and a.seqdoctopdv = b.seqdocto 
+left join monitorpdv.tb_pessoa c on b.cnpjcpf = c.cnpjcpf
+inner join monitorpdv.tb_doctocupom d on a.nroempresa = d.nroempresa and a.nrocheckout = d.nrocheckout and a.seqdoctopdv = d.seqdocto
+where a.dtaabertura between :DT1 and :DT2
+and a.nroempresa  IN (#LS1)
+and a.nroformapagto = 12
+order by 1, 2, 5;
