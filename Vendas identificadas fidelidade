@@ -1,0 +1,19 @@
+select a.nroempresa, 
+       sum(c.vlritem - c.vlrdesconto) as VALOR_TOTAL, 
+       a.numerodf as NRO_NOTAFISCAL, 
+       b.nrocheckout, 
+       to_char(a.cnpjcpf) as CNPJCPF, 
+       b.dtahoremissao as DATA_HORA
+from consinco.mfl_doctofidelidade a
+  inner join consinco.mfl_doctofiscal b on a.seqnf = b.seqnf
+      and a.nroempresa = b.nroempresa
+      and a.numerodf = b.numerodf
+  inner join consinco.mfl_dfitem c on a.seqnf = c.seqnf
+      and a.nroempresa = c.nroempresa
+      and a.numerodf = c.numerodf
+where a.cnpjcpf = :LT1
+ and b.statusdf = 'V'
+ and c.statusitem = 'V'
+ and b.dtamovimento between :DT1 and :DT2
+group by a.nroempresa, a.numerodf,b.nrocheckout, a.cnpjcpf, b.dtahoremissao
+order by b.dtahoremissao;
