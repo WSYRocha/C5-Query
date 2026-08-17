@@ -1,0 +1,63 @@
+SELECT 
+    A.nroempresa AS EMPRESA, 
+    to_char(a.dtamovimento, 'dd/mm/yyyy') AS DTA_MOVTO,
+    (A.total_movto - COALESCE(B.total_detalhe, 0)) AS VALOR,
+    'GT' AS DESCRICAO
+FROM (
+    SELECT nroempresa, dtamovimento, SUM(total) AS total_movto
+    FROM consinco.FI_TSMOVTOOPERADOR A
+    WHERE dtamovimento = :DT1 
+    AND nroempresa = :vnc5NroEmpresa
+GROUP BY nroempresa, dtamovimento
+) A
+LEFT JOIN (
+SELECT nroempresa, dtamovimento, SUM(valor) AS total_detalhe
+FROM consinco.FI_TSMOVTOOPEDETALHE B
+     WHERE b.dtamovimento = :DT1 
+     AND b.nroempresa = :vnc5NroEmpresa
+     AND b.codmovimento in (4, 10) 
+GROUP BY nroempresa, dtamovimento
+) B ON A.nroempresa = B.nroempresa AND A.dtamovimento = B.dtamovimento
+ 
+UNION ALL
+ 
+ 
+SELECT 
+    r.nroempresa, 
+    to_char(r.dtavencimento,  'dd/mm/yyyy'),
+    SUM(f.vlritem) - SUM(f.vlrdesconto) + SUM(f.vlracrescimo),
+    'NOTA_FISCAL' AS DESCRICAO
+FROM consinco.mfl_doctofiscal r 
+LEFT JOIN consinco.mfl_dfitem f ON r.seqnf = f.seqnf
+     WHERE r.dtamovimento = :DT1 
+     AND r.nroempresa = :vnc5NroEmpresa
+     AND r.statusdf = 'V' AND r.codgeraloper IN (37, 48, 123, 911, 916, 610, 615)
+GROUP BY r.nroempresa, r.dtavencimento
+ 
+UNION ALL
+ 
+ 
+SELECT 
+    g.nroempresa, 
+    to_char(g.dtamovimento, 'dd/mm/yyyy'),
+    SUM(g.valor),
+    'XML' AS DESCRICAO
+FROM consinco.c5_log_xml g 
+     WHERE g.nroempresa = :vnc5NroEmpresa
+     AND g.dtamovimento = :DT1
+GROUP BY g.dtamovimento, g.nroempresa
+ 
+UNION ALL
+ 
+ 
+SELECT 
+    r.nroempresa, 
+    to_char(r.dtavencimento, 'dd/mm/yyyy'),
+    SUM(f.vlritem) - SUM(f.vlrdesconto) + SUM(f.vlracrescimo),
+    'PAGAMENTO_NFCE' AS DESCRICAO
+FROM consinco.mfl_doctofiscal r 
+LEFT JOIN consinco.mfl_dfitem f ON r.seqnf = f.seqnf
+    WHERE r.dtamovimento = :DT1 
+    AND r.nroempresa = :vnc5NroEmpresa
+    AND r.statusdf = 'V' AND r.codgeraloper IN (810, 910, 76)
+GROUP BY r.nroempresa, r.dtavencimento;
