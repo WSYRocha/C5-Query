@@ -73,6 +73,7 @@ AND C.USULANCTO LIKE 'TKT%'
 AND C.TIPLANCTO = 'E'
 AND E.QTDEMBALAGEM = 1
 AND A.HISTORICO = 'Transferência para Produção via API'
+----------------------------------------------------------------------- apenas tranferêsncia para produção
 UNION 
 SELECT DISTINCT G.NROEMPRESA,
 TO_CHAR(G.DTAENTRADASAIDA, 'DD/MM/YYYY'),
