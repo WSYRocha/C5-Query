@@ -1,0 +1,27 @@
+SELECT  distinct
+    x.NRONOTA,
+    x.SERIE,
+    c.seqproduto,
+    d.desccompleta,
+    x.SEQPESSOA,
+    x.MODELONF,
+    x.FORNECEDOR,
+    x.FANTASIA,
+    X.NROEMPRESA,
+    to_char(x.DTAEMISSAO,'DD/MM/YYYY') DATA_EMISSAO,
+    to_char(x.DTAENTRADA,'DD/MM/YYYY') DATA_EMISSAO,    
+    x.VALOR,
+    x.VLRDESCONTOS,
+    x.CODHISTORICO,
+    x.REQUISICAO,
+    x.AUTORIZADOR,
+    x.NOME_AUTORIZADOR,
+    x.HISTORICO,
+    x.OBSERVACAO,
+    x.COMPRADORDESPESA,
+    x.OBS_REQUISICAO
+FROM consinco.NAGV_ETLNFDESPESAS_TOTAL x inner join consinco.mfl_doctofiscal a on trunc(a.dtahoremissao) = x.dtaemissao and x.nronota = a.numerodf and a.nroempresa = x.seqpessoa
+inner join consinco.mfl_dfitem c on a.seqnf = c.seqnf
+inner join consinco.map_produto d on c.seqproduto = d.seqproduto
+where X.seqpessoa IN (#LT1)
+AND a.dtamovimento BETWEEN :DT1 AND :DT2;
