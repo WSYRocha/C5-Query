@@ -1,27 +1,25 @@
-SELECT  distinct
-    x.NRONOTA,
-    x.SERIE,
-    c.seqproduto,
-    d.desccompleta,
-    x.SEQPESSOA,
-    x.MODELONF,
-    x.FORNECEDOR,
-    x.FANTASIA,
+SELECT 
+    X.NRONOTA,
+    X.SERIE,
+    B.CODPRODUTO,
+    B.DESCRICAO,
+    X.SEQPESSOA,
+    X.MODELONF,
+    X.FORNECEDOR,
+    X.FANTASIA,
     X.NROEMPRESA,
-    to_char(x.DTAEMISSAO,'DD/MM/YYYY') DATA_EMISSAO,
-    to_char(x.DTAENTRADA,'DD/MM/YYYY') DATA_EMISSAO,    
-    x.VALOR,
-    x.VLRDESCONTOS,
-    x.CODHISTORICO,
-    x.REQUISICAO,
-    x.AUTORIZADOR,
-    x.NOME_AUTORIZADOR,
-    x.HISTORICO,
-    x.OBSERVACAO,
-    x.COMPRADORDESPESA,
-    x.OBS_REQUISICAO
-FROM consinco.NAGV_ETLNFDESPESAS_TOTAL x inner join consinco.mfl_doctofiscal a on trunc(a.dtahoremissao) = x.dtaemissao and x.nronota = a.numerodf and a.nroempresa = x.seqpessoa
-inner join consinco.mfl_dfitem c on a.seqnf = c.seqnf
-inner join consinco.map_produto d on c.seqproduto = d.seqproduto
-where X.seqpessoa IN (#LT1)
-AND a.dtamovimento BETWEEN :DT1 AND :DT2;
+    to_char(X.DTAEMISSAO,'DD/MM/YYYY') DATA_EMISSAO,
+    to_char(X.DTAENTRADA,'DD/MM/YYYY') DATA_EMISSAO,    
+    X.VALOR,
+    X.VLRDESCONTOS,
+    X.CODHISTORICO,
+    X.REQUISICAO,
+    X.AUTORIZADOR,
+    X.NOME_AUTORIZADOR,
+    X.HISTORICO,
+    X.OBSERVACAO,
+    X.COMPRADORDESPESA,
+    X.OBS_REQUISICAO
+FROM consinco.NAGV_ETLNFDESPESAS_TOTAL x INNER JOIN consinco.OR_NFITENSDESPESA B ON X.seqnota = B.SEQNOTA
+where X.seqpessoa IN (LT1)
+AND X.dtaentrada BETWEEN :DT1 AND :DT2
